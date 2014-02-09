@@ -20,16 +20,19 @@ var request = require('request'),
 	});
 
 	imgur.upload = function (image, callback) {
-
-		if(!image || !image.data) {
-			return callback(new Error('invalid image'));
-		}
-
 		if(!imgurClientID) {
 			return callback(new Error('invalid-imgur-client-id'));
 		}
 
-		uploadToImgur(imgurClientID, image.data, 'base64', function(err, data) {
+		if(!image) {
+			return callback(new Error('invalid image'));
+		}
+
+		if(!image.base64 && !image.file && !image.url) {
+			return callback(new Error('invalid image'));
+		}
+
+		uploadToImgur(imgurClientID, image, function(err, data) {
 			if(err) {
 				return callback(err);
 			}
@@ -41,7 +44,7 @@ var request = require('request'),
 		});
 	}
 
-	function uploadToImgur(clientID, image, type, callback) {
+	function uploadToImgur(clientID, image, callback) {
 		var options = {
 			url: 'https://api.imgur.com/3/upload.json',
 			headers: {
@@ -56,7 +59,7 @@ var request = require('request'),
 
 			try {
 				var response = JSON.parse(body);
-
+console.log(response);
 				if(response.success) {
 					callback(null, response.data);
 				} else {
@@ -68,10 +71,23 @@ var request = require('request'),
 			}
 		});
 
-		post.form({
-			type: type,
-			image: image
-		});
+		var type = 'base64';
+		if(image.file) {
+			type = 'file';
+		} else if(image.url) {
+			type = 'URL';
+		}
+
+		var upload = post.form();
+		upload.append('type', type);
+
+		if(image.base64) {
+			upload.append('image', image.base64);
+		} else if(image.file) {
+			upload.append('image', fs.createReadStream(image.file));
+		} else if(image.url) {
+			upload.append('image', image.url);
+		}
 	};
 
 	var admin = {};
