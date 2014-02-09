@@ -1,11 +1,10 @@
-# NodeBB Twitter Hashtag
+# NodeBB Plugin Imgur
 
-Converts twitter hashtags into twitter search links
+A plugin that uploads images to Imgur.
 
 ## Installation
 
-    npm install nodebb-plugin-twitter-hashtag
-
+    npm install nodebb-plugin-imgur
 
 
 
