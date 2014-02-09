@@ -59,7 +59,7 @@ var request = require('request'),
 
 			try {
 				var response = JSON.parse(body);
-console.log(response);
+
 				if(response.success) {
 					callback(null, response.data);
 				} else {
