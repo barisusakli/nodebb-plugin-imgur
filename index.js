@@ -10,29 +10,33 @@ var request = require('request'),
 (function(imgur) {
 	"use strict";
 
+	var imgurClientID = '';
+
+	db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, id) {
+		if(err) {
+			return winston.error(err.message);
+		}
+		imgurClientID = id;
+	});
+
 	imgur.upload = function (image, callback) {
+
 		if(!image || !image.data) {
 			return callback(new Error('invalid image'));
 		}
 
-		db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, imgurClientID) {
+		if(!imgurClientID) {
+			return callback(new Error('invalid-imgur-client-id'));
+		}
+
+		uploadToImgur(imgurClientID, image.data, 'base64', function(err, data) {
 			if(err) {
 				return callback(err);
 			}
 
-			if(!imgurClientID) {
-				return callback(new Error('invalid-imgur-client-id'));
-			}
-
-			uploadToImgur(imgurClientID, image.data, 'base64', function(err, data) {
-				if(err) {
-					return callback(err);
-				}
-
-				callback(null, {
-					url: data.link,
-					name: image.name
-				});
+			callback(null, {
+				url: data.link.replace('http:', 'https:'),
+				name: image.name
 			});
 		});
 	}
