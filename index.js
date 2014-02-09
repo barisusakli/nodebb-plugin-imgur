@@ -5,8 +5,7 @@ var request = require('request'),
 	path = require('path'),
 
 	db = module.parent.require('./database'),
-	templates = module.parent.require('./../public/src/templates'),
-	meta = module.parent.require('./meta');
+	templates = module.parent.require('./../public/src/templates');
 
 (function(imgur) {
 	"use strict";
@@ -16,14 +15,24 @@ var request = require('request'),
 			return callback(new Error('invalid image'));
 		}
 
-		uploadToImgur(meta.config.imgurClientID, image.data, 'base64', function(err, data) {
+		db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, imgurClientID) {
 			if(err) {
 				return callback(err);
 			}
 
-			callback(null, {
-				url: data.link,
-				name: image.name
+			if(!imgurClientID) {
+				return callback(new Error('invalid-imgur-client-id'));
+			}
+
+			uploadToImgur(imgurClientID, image.data, 'base64', function(err, data) {
+				if(err) {
+					return callback(err);
+				}
+
+				callback(null, {
+					url: data.link,
+					name: image.name
+				});
 			});
 		});
 	}
