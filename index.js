@@ -132,7 +132,11 @@ var request = require('request'),
 				callback: function(req, res, callback) {
 
 					if(req.body.imgurClientID !== null && req.body.imgurClientID !== undefined) {
-						db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID);
+						db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID, function(err) {
+							if(!err) {
+								imgurClientID = req.body.imgurClientID;
+							}
+						});
 					}
 
 					callback({message: 'Imgur Client ID saved!'});
