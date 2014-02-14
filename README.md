@@ -7,4 +7,6 @@ A plugin that uploads images to Imgur.
     npm install nodebb-plugin-imgur
 
 
+After installation create an Imgur App and put your Client ID in the control panel.
+
 
