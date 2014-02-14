@@ -24,11 +24,7 @@ var request = require('request'),
 			return callback(new Error('invalid-imgur-client-id'));
 		}
 
-		if(!image) {
-			return callback(new Error('invalid image'));
-		}
-
-		if(!image.base64 && !image.file && !image.url) {
+		if(!image || !image.path) {
 			return callback(new Error('invalid image'));
 		}
 
@@ -71,23 +67,9 @@ var request = require('request'),
 			}
 		});
 
-		var type = 'base64';
-		if(image.file) {
-			type = 'file';
-		} else if(image.url) {
-			type = 'URL';
-		}
-
 		var upload = post.form();
-		upload.append('type', type);
-
-		if(image.base64) {
-			upload.append('image', image.base64);
-		} else if(image.file) {
-			upload.append('image', fs.createReadStream(image.file));
-		} else if(image.url) {
-			upload.append('image', image.url);
-		}
+		upload.append('type', 'file');
+		upload.append('image', fs.createReadStream(image.path));
 	};
 
 	var admin = {};
