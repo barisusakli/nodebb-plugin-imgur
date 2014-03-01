@@ -1,4 +1,6 @@
 
+'use strict';
+
 var request = require('request'),
 	winston = require('winston'),
 	fs = require('fs'),
@@ -8,7 +10,6 @@ var request = require('request'),
 	templates = module.parent.require('./../public/src/templates');
 
 (function(imgur) {
-	"use strict";
 
 	var imgurClientID = '';
 

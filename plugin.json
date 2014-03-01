@@ -11,5 +11,6 @@
         { "hook": "filter:uploadImage", "method": "upload", "callbacked": true, "priority": 6 },
         { "hook": "filter:admin.create_routes", "method": "admin.route", "callbacked": true },
         { "hook": "filter:admin.header.build", "method": "admin.menu", "callbacked": false }
-    ]
+    ],
+    "minver": "0.4.0"
 }
