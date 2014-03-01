@@ -4,7 +4,9 @@
     "description": "A Plugin that uploads images to imgur",
     "url": "https://github.com/barisusakli/nodebb-plugin-imgur",
     "library": "./index.js",
-    "staticDir": "./public",
+    "staticDirs": {
+        "imgur": "public"
+    },
     "hooks": [
         { "hook": "filter:uploadImage", "method": "upload", "callbacked": true, "priority": 6 },
         { "hook": "filter:admin.create_routes", "method": "admin.route", "callbacked": true },
