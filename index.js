@@ -4,10 +4,9 @@
 var request = require('request'),
 	winston = require('winston'),
 	fs = require('fs'),
-	path = require('path'),
 
-	db = module.parent.require('./database'),
-	templates = module.parent.require('./../public/src/templates');
+	db = module.parent.require('./database');
+
 
 (function(imgur) {
 
@@ -19,6 +18,38 @@ var request = require('request'),
 		}
 		imgurClientID = id;
 	});
+
+	imgur.init = function(app, middleware, controllers) {
+
+		app.get('/admin/plugins/imgur', middleware.admin.buildHeader, renderAdmin);
+		app.get('/api/admin/plugins/imgur', renderAdmin);
+
+		app.post('/api/admin/plugins/imgur/save', save);
+	};
+
+	function renderAdmin(req, res, next) {
+		db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, imgurClientID) {
+			if (err) {
+				return next(err);
+			}
+
+			res.render('admin/imgur', {imgurClientID: imgurClientID});
+		});
+	}
+
+	function save(req, res, next) {
+		console.log('saved called');
+		if(req.body.imgurClientID !== null && req.body.imgurClientID !== undefined) {
+			db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID, function(err) {
+				if (err) {
+					return next(err);
+				}
+
+				imgurClientID = req.body.imgurClientID;
+				res.json(200, {message: 'Imgur Client ID saved!'});
+			});
+		}
+	}
 
 	imgur.upload = function (image, callback) {
 		if(!imgurClientID) {
@@ -39,7 +70,7 @@ var request = require('request'),
 				name: image.name
 			});
 		});
-	}
+	};
 
 	function uploadToImgur(clientID, image, callback) {
 		var options = {
@@ -71,64 +102,20 @@ var request = require('request'),
 		var upload = post.form();
 		upload.append('type', 'file');
 		upload.append('image', fs.createReadStream(image.path));
-	};
+	}
 
 	var admin = {};
 
-	admin.menu = function(custom_header, callback) {
+	admin.menu = function(custom_header) {
 		custom_header.plugins.push({
-			"route": '/plugins/imgur',
-			"icon": 'fa-picture-o',
-			"name": 'Imgur'
+			route: '/plugins/imgur',
+			icon: 'fa-picture-o',
+			name: 'Imgur'
 		});
 
 		return custom_header;
 	};
 
-	admin.route = function(custom_routes, callback) {
-
-		fs.readFile(path.join(__dirname, 'public/templates/admin.tpl'), function(err, tpl) {
-
-			custom_routes.routes.push({
-				route: '/plugins/imgur',
-				method: 'get',
-				options: function(req, res, callback) {
-
-					db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, imgurClientID) {
-
-						var newTpl = templates.prepare(tpl.toString()).parse({imgurClientID: imgurClientID});
-
-						callback({
-							req: req,
-							res: res,
-							route: '/plugins/imgur',
-							name: 'Imgur',
-							content: newTpl
-						});
-					});
-				}
-			});
-
-			custom_routes.api.push({
-				route: '/plugins/imgur/save',
-				method: 'post',
-				callback: function(req, res, callback) {
-
-					if(req.body.imgurClientID !== null && req.body.imgurClientID !== undefined) {
-						db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID, function(err) {
-							if(!err) {
-								imgurClientID = req.body.imgurClientID;
-							}
-						});
-					}
-
-					callback({message: 'Imgur Client ID saved!'});
-				}
-			});
-
-			callback(null, custom_routes);
-		});
-	};
 
 	imgur.admin = admin;
 
