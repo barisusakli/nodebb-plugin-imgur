@@ -33,12 +33,11 @@ var request = require('request'),
 				return next(err);
 			}
 
-			res.render('admin/imgur', {imgurClientID: imgurClientID});
+			res.render('admin/plugins/imgur', {imgurClientID: imgurClientID});
 		});
 	}
 
 	function save(req, res, next) {
-		console.log('saved called');
 		if(req.body.imgurClientID !== null && req.body.imgurClientID !== undefined) {
 			db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID, function(err) {
 				if (err) {
