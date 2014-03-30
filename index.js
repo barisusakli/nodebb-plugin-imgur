@@ -105,14 +105,14 @@ var request = require('request'),
 
 	var admin = {};
 
-	admin.menu = function(custom_header) {
-		custom_header.plugins.push({
+	admin.menu = function(menu, callback) {
+		menu.plugins.push({
 			route: '/plugins/imgur',
 			icon: 'fa-picture-o',
 			name: 'Imgur'
 		});
 
-		return custom_header;
+		callback(null, menu);
 	};
 
 
