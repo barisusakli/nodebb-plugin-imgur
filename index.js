@@ -19,12 +19,13 @@ var request = require('request'),
 		imgurClientID = id;
 	});
 
-	imgur.init = function(app, middleware, controllers) {
+	imgur.init = function(app, middleware, controllers, callback) {
 
 		app.get('/admin/plugins/imgur', middleware.admin.buildHeader, renderAdmin);
 		app.get('/api/admin/plugins/imgur', renderAdmin);
 
 		app.post('/api/admin/plugins/imgur/save', save);
+		callback();
 	};
 
 	function renderAdmin(req, res, next) {

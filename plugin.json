@@ -8,7 +8,7 @@
         "imgur": "public"
     },
     "hooks": [
-        { "hook": "action:app.load", "method": "init"},
+        { "hook": "static:app.load", "method": "init"},
 
         { "hook": "filter:admin.header.build", "method": "admin.menu"},
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 }
