@@ -21,10 +21,10 @@ var request = require('request'),
 
 	imgur.init = function(app, middleware, controllers, callback) {
 
-		app.get('/admin/plugins/imgur', middleware.admin.buildHeader, renderAdmin);
-		app.get('/api/admin/plugins/imgur', renderAdmin);
+		app.get('/admin/plugins/imgur', middleware.applyCSRF, middleware.admin.buildHeader, renderAdmin);
+		app.get('/api/admin/plugins/imgur', middleware.applyCSRF, renderAdmin);
 
-		app.post('/api/admin/plugins/imgur/save', save);
+		app.post('/api/admin/plugins/imgur/save', middleware.applyCSRF, save);
 		callback();
 	};
 
@@ -34,7 +34,7 @@ var request = require('request'),
 				return next(err);
 			}
 
-			res.render('admin/plugins/imgur', {imgurClientID: imgurClientID});
+			res.render('admin/plugins/imgur', {imgurClientID: imgurClientID, csrf: req.csrfToken()});
 		});
 	}
 

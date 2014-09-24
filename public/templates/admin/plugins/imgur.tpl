@@ -14,6 +14,8 @@
 
 <button class="btn btn-primary" id="save">Save</button>
 
+<input id="csrf_token" type="hidden" value="{csrf}" />
+
 <script type="text/javascript">
 
 
