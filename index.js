@@ -52,36 +52,44 @@ var request = require('request'),
 	}
 
 	imgur.upload = function (image, callback) {
-		if(!imgurClientID) {
+		if (!imgurClientID) {
 			return callback(new Error('invalid-imgur-client-id'));
 		}
 
-		if(!image || !image.path) {
+		if (!image) {
 			return callback(new Error('invalid image'));
 		}
 
-		uploadToImgur(imgurClientID, image, function(err, data) {
-			if(err) {
+		var type = image.url ? 'url' : 'file';
+
+		if (type === 'file' && !image.path) {
+			return callback(new Error('invalid image path'));
+		}
+
+		var imageData = type === 'file' ? fs.createReadStream(image.path) : image.url;
+
+		uploadToImgur(type, imageData, function(err, data) {
+			if (err) {
 				return callback(err);
 			}
 
 			callback(null, {
 				url: data.link.replace('http:', 'https:'),
-				name: image.name
+				name: image.name || ''
 			});
 		});
 	};
 
-	function uploadToImgur(clientID, image, callback) {
+	function uploadToImgur(type, image, callback) {
 		var options = {
 			url: 'https://api.imgur.com/3/upload.json',
 			headers: {
-				'Authorization': 'Client-ID ' + clientID
+				'Authorization': 'Client-ID ' + imgurClientID
 			}
 		};
 
 		var post = request.post(options, function (err, req, body) {
-			if(err) {
+			if (err) {
 				return callback(err);
 			}
 
@@ -94,14 +102,14 @@ var request = require('request'),
 					callback(new Error(response.data.error.message));
 				}
 			} catch(e) {
-				winston.error('Unable to parse Imgur json response. [' + body +']');
+				winston.error('Unable to parse Imgur json response. [' + body +']', e.message);
 				callback(e);
 			}
 		});
 
 		var upload = post.form();
-		upload.append('type', 'file');
-		upload.append('image', fs.createReadStream(image.path));
+		upload.append('type', type);
+		upload.append('image', image);
 	}
 
 	var admin = {};
