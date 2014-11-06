@@ -51,10 +51,12 @@ var request = require('request'),
 		}
 	}
 
-	imgur.upload = function (image, callback) {
+	imgur.upload = function (data, callback) {
 		if (!imgurClientID) {
 			return callback(new Error('invalid-imgur-client-id'));
 		}
+
+		var image = data.image;
 
 		if (!image) {
 			return callback(new Error('invalid image'));
