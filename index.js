@@ -19,12 +19,12 @@ var request = require('request'),
 		imgurClientID = id;
 	});
 
-	imgur.init = function(app, middleware, controllers, callback) {
+	imgur.init = function(params, callback) {
 
-		app.get('/admin/plugins/imgur', middleware.applyCSRF, middleware.admin.buildHeader, renderAdmin);
-		app.get('/api/admin/plugins/imgur', middleware.applyCSRF, renderAdmin);
+		params.router.get('/admin/plugins/imgur', params.middleware.applyCSRF, params.middleware.admin.buildHeader, renderAdmin);
+		params.router.get('/api/admin/plugins/imgur', params.middleware.applyCSRF, renderAdmin);
 
-		app.post('/api/admin/plugins/imgur/save', middleware.applyCSRF, save);
+		params.router.post('/api/admin/plugins/imgur/save', params.middleware.applyCSRF, save);
 		callback();
 	};
 
