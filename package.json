@@ -18,8 +18,8 @@
   "author": "Baris Usakli <baris@designcreateplay.com>",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "request": "^2.34.0",
-    "winston": "~0.7.2"
+    "request": "^2.48.0",
+    "winston": "~0.8.3"
   },
   "nbbpm": {
     "compatibility": "^0.6.0"
