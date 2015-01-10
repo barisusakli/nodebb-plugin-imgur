@@ -25,6 +25,7 @@ var request = require('request'),
 		params.router.get('/api/admin/plugins/imgur', params.middleware.applyCSRF, renderAdmin);
 
 		params.router.post('/api/admin/plugins/imgur/save', params.middleware.applyCSRF, save);
+
 		callback();
 	};
 
@@ -46,7 +47,7 @@ var request = require('request'),
 				}
 
 				imgurClientID = req.body.imgurClientID;
-				res.json(200, {message: 'Imgur Client ID saved!'});
+				res.status(200).json({message: 'Imgur Client ID saved!'});
 			});
 		}
 	}
