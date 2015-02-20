@@ -21,7 +21,7 @@
 
 	$('#save').on('click', function() {
 
-		$.post('/api/admin/plugins/imgur/save', {_csrf : $('#csrf_token').val(), imgurClientID : $('#imgurClientID').val()}, function(data) {
+		$.post(config.relative_path + '/api/admin/plugins/imgur/save', {_csrf : $('#csrf_token').val(), imgurClientID : $('#imgurClientID').val()}, function(data) {
 			app.alertSuccess(data.message);
 		});
 
