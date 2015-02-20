@@ -24,7 +24,7 @@ var request = require('request'),
 		params.router.get('/admin/plugins/imgur', params.middleware.applyCSRF, params.middleware.admin.buildHeader, renderAdmin);
 		params.router.get('/api/admin/plugins/imgur', params.middleware.applyCSRF, renderAdmin);
 
-		params.router.post('/api/admin/plugins/imgur/save', params.middleware.applyCSRF, save);
+		params.router.post(config.relative_path + '/api/admin/plugins/imgur/save', params.middleware.applyCSRF, save);
 
 		callback();
 	};
