@@ -36,7 +36,7 @@
 			albumID: $('#albumID').val()
 		};
 
-		$.post('/api/admin/plugins/imgur/save', data, function(data) {
+		$.post(config.relative+relative_path + '/api/admin/plugins/imgur/save', data, function(data) {
 			app.alertSuccess(data.message);
 		});
 
@@ -51,5 +51,5 @@
 
 		window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=code';
 	});
-
 </script>
+
