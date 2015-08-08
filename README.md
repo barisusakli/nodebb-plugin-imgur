@@ -18,8 +18,11 @@ A plugin that uploads images to Imgur.
 * Enter these values in your NodeBB ACP page.
 [![](http://i.imgur.com/6hYkOc9.png)](http://i.imgur.com/6hYkOc9.png)
 
+* After entering the values click Authorize, you will be redirected to imgur to allow access to your app.* 
 
-Optinally create an album for your forum on imgur and put its album ID in the NodeBB ACP.
+* Once you allow access you will be redirected back to nodebb.
+
+* Optinally create an album for your forum on imgur and put its album ID in the NodeBB ACP.
 
 
 
