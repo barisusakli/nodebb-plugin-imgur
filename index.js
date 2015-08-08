@@ -10,13 +10,13 @@ var request = require('request'),
 
 (function(imgur) {
 
-	var imgurClientID = '';
+	var settings;
 
-	db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, id) {
-		if(err) {
+	db.getObject('nodebb-plugin-imgur', function(err, _settings) {
+		if (err) {
 			return winston.error(err.message);
 		}
-		imgurClientID = id;
+		settings = _settings;
 	});
 
 	imgur.init = function(params, callback) {
@@ -26,34 +26,103 @@ var request = require('request'),
 
 		params.router.post('/api/admin/plugins/imgur/save', params.middleware.applyCSRF, save);
 
+		params.router.get('/admin/plugins/imgur/oauth', authorize);
+
 		callback();
 	};
 
 	function renderAdmin(req, res, next) {
-		db.getObjectField('nodebb-plugin-imgur', 'imgurClientID', function(err, imgurClientID) {
+		var data = {
+			imgurClientID: settings.imgurClientID,
+			imgurSecret: settings.imgurSecret,
+			albumID: settings.albumID
+		};
+		res.render('admin/plugins/imgur', {settings: data, csrf: req.csrfToken()});
+	}
+
+	function save(req, res, next) {
+		var data = {
+			imgurClientID: req.body.imgurClientID || '',
+			imgurSecret: req.body.imgurSecret || '',
+			albumID: req.body.albumID || ''
+		};
+
+		db.setObject('nodebb-plugin-imgur', data, function(err) {
 			if (err) {
 				return next(err);
 			}
 
-			res.render('admin/plugins/imgur', {imgurClientID: imgurClientID, csrf: req.csrfToken()});
+			settings.imgurClientID = data.imgurClientID;
+			settings.imgurSecret = data.imgurSecret;
+			settings.albumID = data.albumID;
+			res.status(200).json({message: 'Settings saved!'});
 		});
 	}
 
-	function save(req, res, next) {
-		if(req.body.imgurClientID !== null && req.body.imgurClientID !== undefined) {
-			db.setObjectField('nodebb-plugin-imgur', 'imgurClientID', req.body.imgurClientID, function(err) {
+	function authorize(req, res, next) {
+		if (!req.query.code) {
+			return next(new Error('[[error:invalid-code-from-imgur]]'));
+		}
+
+		request.post({url: 'https://api.imgur.com/oauth2/token', formData: {
+			client_id: settings.imgurClientID,
+			client_secret: settings.imgurSecret,
+			grant_type: 'authorization_code',
+			code: req.query.code
+		}}, function(err, response, body) {
+			if (err) {
+				return next(err);
+			}
+
+			saveTokens(body, function(err) {
 				if (err) {
 					return next(err);
 				}
-
-				imgurClientID = req.body.imgurClientID;
-				res.status(200).json({message: 'Imgur Client ID saved!'});
+				res.redirect('/admin/plugins/imgur');
 			});
+		});
+	}
+
+	function refreshToken(callback) {
+		request.post({url: 'https://api.imgur.com/oauth2/token', formData: {
+			client_id: settings.imgurClientID,
+			client_secret: settings.imgurSecret,
+			grant_type: 'refresh_token',
+			refresh_token: settings.refresh_token
+		}}, function(err, response, body) {
+			if (err) {
+				return callback(err);
+			}
+
+			saveTokens(body, callback);
+		});
+	}
+
+	function saveTokens(data, callback) {
+		try {
+			data = JSON.parse(data);
+		} catch(err) {
+			return callback(err);
 		}
+		data.expiresAt = Date.now() + parseInt(data.expires_in, 10) * 1000;
+
+		db.setObject('nodebb-plugin-imgur', {
+			access_token: data.access_token,
+			refresh_token: data.refresh_token,
+			expiresAt: data.expiresAt
+		}, function(err) {
+			if (err) {
+				return callback(err);
+			}
+			settings.access_token = data.access_token;
+			settings.refresh_token = data.refresh_token;
+			settings.expiresAt = data.expiresAt;
+			callback();
+		});
 	}
 
 	imgur.upload = function (data, callback) {
-		if (!imgurClientID) {
+		if (!settings.imgurClientID) {
 			return callback(new Error('invalid-imgur-client-id'));
 		}
 
@@ -84,35 +153,51 @@ var request = require('request'),
 	};
 
 	function uploadToImgur(type, image, callback) {
-		var options = {
-			url: 'https://api.imgur.com/3/upload.json',
-			headers: {
-				'Authorization': 'Client-ID ' + imgurClientID
-			}
-		};
-
-		var post = request.post(options, function (err, req, body) {
-			if (err) {
-				return callback(err);
-			}
-
-			try {
-				var response = JSON.parse(body);
-
-				if(response.success) {
-					callback(null, response.data);
-				} else {
-					callback(new Error(response.data.error.message));
+		function doUpload() {
+			var options = {
+				url: 'https://api.imgur.com/3/upload.json',
+				headers: {
+					'Authorization': 'Bearer ' + settings.access_token
+				},
+				formData: {
+					type: type,
+					image: image
 				}
-			} catch(e) {
-				winston.error('Unable to parse Imgur json response. [' + body +']', e.message);
-				callback(e);
-			}
-		});
+			};
 
-		var upload = post.form();
-		upload.append('type', type);
-		upload.append('image', image);
+			if (settings.albumID) {
+				options.formData.album = settings.albumID;
+			}
+
+			request.post(options, function (err, req, body) {
+				if (err) {
+					return callback(err);
+				}
+				var response;
+				try {
+					response = JSON.parse(body);
+				} catch(err) {
+					winston.error('Unable to parse Imgur json response. [' + body +']', err.message);
+					return callback(err);
+				}
+
+				if (response.success) {
+					return callback(null, response.data);
+				}
+
+				if (response.data.error && response.data.error === 'The access token provided is invalid.') {
+					return refreshToken(doUpload);
+				}
+
+				callback(new Error(response.data.error.message || response.data.error));
+			});
+		}
+
+		if (Date.now() >= settings.expiresAt) {
+			refreshToken(doUpload);
+		} else {
+			doUpload();
+		}
 	}
 
 	var admin = {};
