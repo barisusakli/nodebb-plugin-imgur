@@ -84,6 +84,14 @@ var request = require('request'),
 	}
 
 	function refreshToken(callback) {
+		if (!settings.imgurClientID || !settings.imgurSecret) {
+			return callback(new Error('[[error:invalid-imgur-id-or-secret]]'));
+		}
+
+		if (!settings.refresh_token) {
+			return callback(new Error('[[error:invalid-refresh-token]]'));
+		}
+
 		request.post({url: 'https://api.imgur.com/oauth2/token', formData: {
 			client_id: settings.imgurClientID,
 			client_secret: settings.imgurSecret,
@@ -153,7 +161,10 @@ var request = require('request'),
 	};
 
 	function uploadToImgur(type, image, callback) {
-		function doUpload() {
+		function doUpload(err) {
+			if (err) {
+				return callback(err);
+			}
 			var options = {
 				url: 'https://api.imgur.com/3/upload.json',
 				headers: {
