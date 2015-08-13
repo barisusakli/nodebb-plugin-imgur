@@ -36,7 +36,7 @@
 			albumID: $('#albumID').val()
 		};
 
-		$.post(config.relative+relative_path + '/api/admin/plugins/imgur/save', data, function(data) {
+		$.post(config.relative_path + '/api/admin/plugins/imgur/save', data, function(data) {
 			app.alertSuccess(data.message);
 		});
 
