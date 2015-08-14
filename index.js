@@ -16,7 +16,8 @@ var request = require('request'),
 		if (err) {
 			return winston.error(err.message);
 		}
-		settings = _settings;
+		settings = _settings || {};
+
 	});
 
 	imgur.init = function(params, callback) {
