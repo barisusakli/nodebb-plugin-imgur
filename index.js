@@ -147,18 +147,17 @@ var request = require('request'),
 			return callback(new Error('invalid image path'));
 		}
 
-		var imageData = type === 'file' ? fs.createReadStream(image.path) : image.url;
-
-		uploadToImgur(type, imageData, function(err, data) {
-			if (err) {
-				return callback(err);
-			}
-
-			callback(null, {
-				url: data.link.replace('http:', 'https:'),
-				name: image.name || ''
+		if (type === 'file') {
+			var stream = fs.createReadStream(image.path);
+			stream.on('error', function(err) {
+				callback(err);
 			});
-		});
+			stream.on('readable', function() {
+				uploadToImgur(type, stream, callback);
+			});
+		} else {
+			uploadToImgur(type, image.url, callback);
+		}
 	};
 
 	function uploadToImgur(type, image, callback) {
@@ -194,7 +193,7 @@ var request = require('request'),
 				}
 
 				if (response.success) {
-					return callback(null, response.data);
+					return callback(null, {url: response.data.link.replace('http:', 'https:')});
 				}
 
 				if (response.data.error && response.data.error === 'The access token provided is invalid.') {
