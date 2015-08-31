@@ -131,40 +131,36 @@ var request = require('request'),
 	}
 
 	imgur.upload = function (data, callback) {
-		if (!settings.imgurClientID) {
-			return callback(new Error('invalid-imgur-client-id'));
-		}
-
-		var image = data.image;
-
-		if (!image) {
-			return callback(new Error('invalid image'));
-		}
-
-		var type = image.url ? 'url' : 'file';
-
-		if (type === 'file' && !image.path) {
-			return callback(new Error('invalid image path'));
-		}
-
-		if (type === 'file') {
-			var stream = fs.createReadStream(image.path);
-			stream.on('error', function(err) {
-				callback(err);
-			});
-			stream.on('readable', function() {
-				uploadToImgur(type, stream, callback);
-			});
-		} else {
-			uploadToImgur(type, image.url, callback);
-		}
-	};
-
-	function uploadToImgur(type, image, callback) {
 		function doUpload(err) {
+			function done(err) {
+				if (!callbackCalled) {
+					callbackCalled = true;
+					callback(err);
+				}
+			}
+
 			if (err) {
 				return callback(err);
 			}
+
+			var callbackCalled = false;
+			var type = image.url ? 'url' : 'file';
+			if (type === 'file' && !image.path) {
+				return callback(new Error('invalid image path'));
+			}
+
+			var data;
+			if (type === 'file') {
+				data = fs.createReadStream(image.path);
+				data.on('error', function(err) {
+					done(err);
+				});
+			} else if (type === 'url') {
+				data = image.url;
+			} else {
+				return callback(new Error('unknown-type'));
+			}
+
 			var options = {
 				url: 'https://api.imgur.com/3/upload.json',
 				headers: {
@@ -172,7 +168,7 @@ var request = require('request'),
 				},
 				formData: {
 					type: type,
-					image: image
+					image: data
 				}
 			};
 
@@ -182,26 +178,38 @@ var request = require('request'),
 
 			request.post(options, function (err, req, body) {
 				if (err) {
-					return callback(err);
+					return done(err);
 				}
 				var response;
 				try {
 					response = JSON.parse(body);
 				} catch(err) {
 					winston.error('Unable to parse Imgur json response. [' + body +']', err.message);
-					return callback(err);
+					return done(err);
 				}
 
 				if (response.success) {
-					return callback(null, {url: response.data.link.replace('http:', 'https:')});
+					return callback(null, {
+						name: image.name,
+						url: response.data.link.replace('http:', 'https:')
+					});
 				}
 
 				if (response.data.error && response.data.error === 'The access token provided is invalid.') {
 					return refreshToken(doUpload);
 				}
 
-				callback(new Error(response.data.error.message || response.data.error));
+				done(new Error(response.data.error.message || response.data.error));
 			});
+		}
+
+		if (!settings.imgurClientID) {
+			return callback(new Error('invalid-imgur-client-id'));
+		}
+
+		var image = data.image;
+		if (!image) {
+			return callback(new Error('invalid image'));
 		}
 
 		if (Date.now() >= settings.expiresAt) {
@@ -209,7 +217,7 @@ var request = require('request'),
 		} else {
 			doUpload();
 		}
-	}
+	};
 
 	var admin = {};
 
