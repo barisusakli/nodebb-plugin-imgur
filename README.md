@@ -16,7 +16,7 @@ A plugin that uploads images to Imgur.
 [![](http://i.imgur.com/haE9jzj.png)](http://i.imgur.com/haE9jzj.png)
 
 * Enter these values in your NodeBB ACP page.
-[![](http://i.imgur.com/6hYkOc9.png)](http://i.imgur.com/6hYkOc9.png)
+[![](http://i.imgur.com/p86s7lv.png)](http://i.imgur.com/p86s7lv.png)
 
 * After entering the values click Authorize, you will be redirected to imgur to allow access to your app. 
 
