@@ -65,6 +65,14 @@ var request = require('request'),
 			return next(new Error('[[error:invalid-code-from-imgur]]'));
 		}
 
+		if (!settings.imgurClientID) {
+			return next(new Error('[[error:no-imgur-client-id]]'))
+		}
+
+		if (!settings.imgurSecret) {
+			return next(new Error('[[error:no-imgur-secret]]'))
+		}
+
 		request.post({url: 'https://api.imgur.com/oauth2/token', formData: {
 			client_id: settings.imgurClientID,
 			client_secret: settings.imgurSecret,
