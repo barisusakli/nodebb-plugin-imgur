@@ -1,5 +1,3 @@
-<h1>Imgur</h1>
-
 
 <form class="form">
 	<div class="row">
@@ -19,6 +17,13 @@
 		</div>
 	</div>
 </form>
+
+<!-- IF needsAuthorization -->
+<div class="alert alert-warning">
+Access Token and/or Refresh Token missing. Please click Authorize below.
+</div>
+<!-- ENDIF needsAuthorization -->
+
 
 <button class="btn btn-primary" id="save">Save</button>
 <button class="btn btn-success" id="authorize">Authorize</button>

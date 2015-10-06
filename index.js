@@ -36,7 +36,8 @@ var request = require('request'),
 		var data = {
 			imgurClientID: settings.imgurClientID,
 			imgurSecret: settings.imgurSecret,
-			albumID: settings.albumID
+			albumID: settings.albumID,
+			needsAuthorization: !settings.access_token || !settings.refresh_token
 		};
 		res.render('admin/plugins/imgur', {settings: data, csrf: req.csrfToken()});
 	}
@@ -122,6 +123,14 @@ var request = require('request'),
 			return callback(err);
 		}
 		data.expiresAt = Date.now() + parseInt(data.expires_in, 10) * 1000;
+
+		if (!data.access_token) {
+			return callback(new Error('[[error:unable-to-get-access-token]]'));
+		}
+
+		if (!data.refresh_token) {
+			return callback(new Error('[[error:unable-to-get-refresh-token]]'));
+		}
 
 		db.setObject('nodebb-plugin-imgur', {
 			access_token: data.access_token,
