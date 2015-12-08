@@ -1,3 +1,20 @@
+<div class="alert alert-info">
+<ul>
+	<li>
+		<p>Register an imgur app <a href="https://api.imgur.com/oauth2/addclient">here</a>, make sure you fill in the callback URL properly. It should be <code>http://yourforum.com/admin/plugins/imgur/oauth</code> adjust based on your forum url.
+		</p>
+	</li>
+	<li>
+		<p>
+		Once you register you will get a client ID and secret. Enter these values below.
+		</p>
+	</li>
+	<li><p>Optinally create an album for your forum on imgur and put its album ID below.</p></li>
+
+	<li><p>After entering the values click Save and then Authorize, you will be redirected to imgur to allow access to your app. </p></li>
+	<li><p>Once you allow access you will be redirected back to nodebb.</p></li>
+</ul>
+</div>
 
 <form class="form">
 	<div class="row">
