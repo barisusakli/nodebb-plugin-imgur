@@ -1,11 +1,12 @@
 
 'use strict';
 
-var request = require('request'),
-	winston = require('winston'),
-	fs = require('fs'),
+var request = require('request');
+var winston = require('winston');
+var fs = require('fs');
+var nconf = require.main.require('nconf');
 
-	db = module.parent.require('./database');
+var db = module.parent.require('./database');
 
 
 (function(imgur) {
@@ -67,11 +68,11 @@ var request = require('request'),
 		}
 
 		if (!settings.imgurClientID) {
-			return next(new Error('[[error:no-imgur-client-id]]'))
+			return next(new Error('[[error:no-imgur-client-id]]'));
 		}
 
 		if (!settings.imgurSecret) {
-			return next(new Error('[[error:no-imgur-secret]]'))
+			return next(new Error('[[error:no-imgur-secret]]'));
 		}
 
 		request.post({url: 'https://api.imgur.com/oauth2/token', formData: {
@@ -88,7 +89,7 @@ var request = require('request'),
 				if (err) {
 					return next(err);
 				}
-				res.redirect('/admin/plugins/imgur');
+				res.redirect(nconf.get('relative_path') + '/admin/plugins/imgur');
 			});
 		});
 	}
