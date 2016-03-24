@@ -242,7 +242,7 @@ var db = module.parent.require('./database');
 	admin.menu = function(menu, callback) {
 		menu.plugins.push({
 			route: '/plugins/imgur',
-			icon: 'fa-picture-o',
+			icon: 'fa-cloud-upload',
 			name: 'Imgur'
 		});
 
