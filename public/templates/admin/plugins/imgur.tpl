@@ -9,7 +9,7 @@
 		Once you register you will get a client ID and secret. Enter these values below.
 		</p>
 	</li>
-	<li><p>Optinally create an album for your forum on imgur and put its album ID below.</p></li>
+	<li><p>Optionally, create an album for your forum on imgur and put its album ID below. You can find the ID by going to the album URL and taking the characters after the `/a`. Ex. for `http://imgur.com/a/abcdef`, the ID is `abcdef`</p></li>
 
 	<li><p>After entering the values click Save and then Authorize, you will be redirected to imgur to allow access to your app. </p></li>
 	<li><p>Once you allow access you will be redirected back to nodebb.</p></li>
