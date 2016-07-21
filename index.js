@@ -145,7 +145,7 @@ var db = module.parent.require('./database');
 			return callback(new Error('[[error:unable-to-get-refresh-token]]'));
 		}
 
-		db.setObject('nodebb-plugin-imgur', {
+		db.setObject(dbSettingsKey, {
 			access_token: data.access_token,
 			refresh_token: data.refresh_token,
 			expiresAt: data.expiresAt
@@ -158,6 +158,10 @@ var db = module.parent.require('./database');
 		var settings;
 		var image = data.image;
 
+		if (!image) {
+			return callback(new Error('invalid image'));
+		}
+
 		async.waterfall([
 			function(next) {
 				db.getObject(dbSettingsKey, next);
@@ -169,10 +173,6 @@ var db = module.parent.require('./database');
 					return next(new Error('invalid-imgur-client-id'));
 				}
 
-				if (!image) {
-					return next(new Error('invalid image'));
-				}
-
 				if (Date.now() >= settings.expiresAt) {
 					refreshToken(next);
 				} else {
@@ -180,12 +180,12 @@ var db = module.parent.require('./database');
 				}
 			},
 			function (next) {
-				doUpload(image, settings, next);
+				doUpload(data, settings, next);
 			}
 		], callback);
 	};
 
-	function doUpload(image, settings, callback) {
+	function doUpload(data, settings, callback) {
 		function done(err) {
 			if (!callbackCalled) {
 				callbackCalled = true;
@@ -193,20 +193,22 @@ var db = module.parent.require('./database');
 			}
 		}
 
+		var image = data.image;
+
 		var callbackCalled = false;
 		var type = image.url ? 'url' : 'file';
 		if (type === 'file' && !image.path) {
 			return callback(new Error('invalid image path'));
 		}
 
-		var data;
+		var formDataImage;
 		if (type === 'file') {
-			data = fs.createReadStream(image.path);
-			data.on('error', function(err) {
+			formDataImage = fs.createReadStream(image.path);
+			formDataImage.on('error', function(err) {
 				done(err);
 			});
 		} else if (type === 'url') {
-			data = image.url;
+			formDataImage = image.url;
 		} else {
 			return callback(new Error('unknown-type'));
 		}
@@ -218,7 +220,7 @@ var db = module.parent.require('./database');
 			},
 			formData: {
 				type: type,
-				image: data
+				image: formDataImage
 			}
 		};
 
@@ -230,6 +232,7 @@ var db = module.parent.require('./database');
 			if (err) {
 				return done(err);
 			}
+
 			var response;
 			try {
 				response = JSON.parse(body);
@@ -251,7 +254,7 @@ var db = module.parent.require('./database');
 						refreshToken(next);
 					},
 					function(next) {
-						doUpload(image, settings, next);
+						imgur.upload(data, next);
 					}
 				], callback);
 			}
