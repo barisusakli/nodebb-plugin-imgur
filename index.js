@@ -257,6 +257,7 @@ var db = module.parent.require('./database');
 						imgur.upload(data, next);
 					}
 				], callback);
+				return;
 			}
 
 			done(new Error(response.data.error.message || response.data.error));
