@@ -48,9 +48,8 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 <input id="csrf_token" type="hidden" value="{csrf}" />
 
 <script type="text/javascript">
-
-
-	$('#save').on('click', function() {
+(function() {
+	var save = function(callback) {
 		var data = {
 			_csrf: $('#csrf_token').val(),
 			imgurClientID: $('#imgurClientID').val(),
@@ -60,18 +59,27 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 
 		$.post(config.relative_path + '/api/admin/plugins/imgur/save', data, function(data) {
 			app.alertSuccess(data.message);
+
+			if (typeof callback === 'function') {
+				callback();
+			}
 		});
 
 		return false;
-	});
+	};
 
+	$('#save').on('click', save);
 	$('#authorize').on('click', function() {
-		var clientID = $('#imgurClientID').val();
-		if (!clientID) {
-			return app.alertError('[[error:no-imgur-client-id]]');
-		}
+		save(function() {
+			var clientID = $('#imgurClientID').val();
+			if (!clientID) {
+				return app.alertError('[[error:no-imgur-client-id]]');
+			}
 
-		window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=code';
+			window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=code';
+		});
 	});
+})();
+
 </script>
 
