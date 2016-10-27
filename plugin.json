@@ -14,5 +14,8 @@
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 }
 
     ],
+    "acpScripts": [
+        "lib/admin.js"
+    ],
     "templates": "./public/templates"
 }
