@@ -14,5 +14,6 @@
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 }
 
     ],
-    "templates": "./public/templates"
+    "templates": "./public/templates",
+    "settingsRoute": "/admin/plugins/imgur"
 }
