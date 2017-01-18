@@ -14,8 +14,13 @@
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 }
 
     ],
+<<<<<<< HEAD
     "acpScripts": [
         "lib/admin.js"
     ],
     "templates": "./public/templates"
+=======
+    "templates": "./public/templates",
+    "settingsRoute": "/admin/plugins/imgur"
+>>>>>>> 67a55247d591e16d99f6ce65f7a17401dcf5abef
 }
