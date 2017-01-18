@@ -17,5 +17,6 @@
     "acpScripts": [
         "lib/admin.js"
     ],
-    "templates": "./public/templates"
+    "templates": "./public/templates",
+    "settingsRoute": "/admin/plugins/imgur"
 }
