@@ -1,7 +1,7 @@
 <div class="alert alert-info">
 <ul>
 	<li>
-		<p>Register an imgur app <a href="https://api.imgur.com/oauth2/addclient">here</a>, make sure you fill in the callback URL properly. It should be <code>http://yourforum.com/admin/plugins/imgur/oauth</code> adjust based on your forum url.
+		<p>Register an imgur app <a href="https://api.imgur.com/oauth2/addclient">here</a>, make sure you fill in the callback URL properly. It should be <code>http://yourforum.com/admin/plugins/imgur</code> adjust based on your forum url.
 		</p>
 	</li>
 	<li>
@@ -49,6 +49,20 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 
 <script type="text/javascript">
 
+	var params = {};
+	var queryString = location.hash.substring(1);
+	var regex = /([^&=]+)=([^&]*)/g;
+	var m;
+	while (m = regex.exec(queryString)) {
+		params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+	}
+
+	if (params.access_token && params.refresh_token) {
+		params._csrf = $('#csrf_token').val();
+		$.post(config.relative_path + '/admin/plugins/imgur/tokens', params, function () {
+			app.alertSuccess('Authorized');
+		});
+	}
 
 	$('#save').on('click', function() {
 		var data = {
@@ -71,7 +85,7 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 			return app.alertError('[[error:no-imgur-client-id]]');
 		}
 
-		window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=code';
+		window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=token';
 	});
 </script>
 
