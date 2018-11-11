@@ -8,7 +8,7 @@ var fs = require('fs');
 var nconf = require.main.require('nconf');
 var async = require.main.require('async');
 
-var db = module.parent.require('./database');
+var db = require.main.require('./src/database');
 
 var imgur = module.exports;
 
