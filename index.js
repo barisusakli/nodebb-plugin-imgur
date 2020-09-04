@@ -148,20 +148,19 @@ async function deleteImageByHash(imageHash) {
 	throw new Error(response.data.error.message || response.data.error);
 }
 
-async function deleteUserImage(userData) {
-	const pic = userData && userData.uploadedpicture;
-	if (!pic) {
+async function deleteUserImage(pictureUrl) {
+	if (!pictureUrl) {
 		return;
 	}
-	const match = pic.match(/^http.+imgur.+\/(.+)\./);
+	const match = pictureUrl.match(/^http.+imgur.+\/(.+)\./);
 	if (match && match[1]) {
 		await deleteImageByHash(match[1]);
 	}
 }
 
-async function deleteCurrentImage(uid) {
+async function deleteCurrentImage(uid, field) {
 	const userData = await user.getUserData(uid);
-	await deleteUserImage(userData);
+	await deleteUserImage(userData && userData[field]);
 }
 
 imgur.upload = async function (data) {
@@ -173,9 +172,13 @@ imgur.upload = async function (data) {
 		throw new Error('invalid-imgur-client-id');
 	}
 
-	// uploading a new profile image will delete old one
+	// uploading a new profile image or cover will delete old one
 	if (data.uid && data.folder === 'profile') {
-		await deleteCurrentImage(data.uid);
+		if (data.image.name === 'profileAvatar') {
+			await deleteCurrentImage(data.uid, 'uploadedpicture');
+		} else if (data.image.name === 'profileCover') {
+			await deleteCurrentImage(data.uid, 'cover:url');
+		}
 	}
 
 	if (Date.now() >= settings.expiresAt) {
@@ -242,11 +245,16 @@ async function doUpload(data, settings) {
 }
 
 imgur.actionUserDelete = async function (hookData) {
-	await deleteUserImage(hookData.user);
+	await deleteUserImage(hookData.user && hookData.user.uploadedpicture);
+	await deleteUserImage(hookData.user && hookData.user['cover:url']);
 };
 
 imgur.actionUserRemoveUploadedPicture = async function (hookData) {
-	await deleteUserImage(hookData.user);
+	await deleteUserImage(hookData.user && hookData.user.uploadedpicture);
+};
+
+imgur.actionUserRemoveCoverPicture = async function (hookData) {
+	await deleteUserImage(hookData.user && hookData.user['cover:url']);
 };
 
 imgur.admin = {};

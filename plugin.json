@@ -14,6 +14,7 @@
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 },
         { "hook": "action:user.delete", "method": "actionUserDelete" },
         { "hook": "action:user.removeUploadedPicture", "method": "actionUserRemoveUploadedPicture" }
+        { "hook": "action:user.removeCoverPicture", "method": "actionUserRemoveCoverPicture" }
     ],
     "templates": "./public/templates",
     "settingsRoute": "/admin/plugins/imgur"
