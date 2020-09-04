@@ -245,6 +245,9 @@ imgur.actionUserDelete = async function (hookData) {
 	await deleteUserImage(hookData.user);
 };
 
+imgur.actionUserRemoveUploadedPicture = async function (hookData) {
+	await deleteUserImage(hookData.user);
+};
 
 imgur.admin = {};
 

@@ -12,7 +12,8 @@
 
         { "hook": "filter:admin.header.build", "method": "admin.menu" },
         { "hook": "filter:uploadImage", "method": "upload", "priority": 6 },
-        { "hook": "action:user.delete", "method": "actionUserDelete" }
+        { "hook": "action:user.delete", "method": "actionUserDelete" },
+        { "hook": "action:user.removeUploadedPicture", "method": "actionUserRemoveUploadedPicture" }
     ],
     "templates": "./public/templates",
     "settingsRoute": "/admin/plugins/imgur"
