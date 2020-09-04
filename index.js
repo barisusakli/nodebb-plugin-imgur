@@ -177,7 +177,7 @@ imgur.upload = async function (data) {
 	if (Date.now() >= settings.expiresAt) {
 		await refreshToken();
 	}
-	await doUpload(data, settings);
+	return await doUpload(data, settings);
 };
 
 async function doUpload(data, settings) {
@@ -231,8 +231,7 @@ async function doUpload(data, settings) {
 
 	if (response.data.error && response.data.error === 'The access token provided is invalid.') {
 		await refreshToken();
-		await imgur.upload(data);
-		return;
+		return await imgur.upload(data);
 	}
 
 	throw new Error(response.data.error.message || response.data.error);
