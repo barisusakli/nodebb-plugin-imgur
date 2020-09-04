@@ -99,12 +99,15 @@ function refreshToken(callback) {
 				if (err) {
 					return callback(err);
 				}
+				var data;
 				try {
 					data = JSON.parse(body);
 				} catch (err) {
 					return callback(err);
 				}
-
+				if (data && !data.success && data.error) {
+					return callback(new Error(data.error))
+				}
 				saveTokens(data, next);
 			});
 		}
