@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-imgur",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "A Plugin that uploads images to imgur",
   "main": "index.js",
   "repository": {
@@ -18,10 +18,14 @@
   "author": "Baris Usakli <baris@designcreateplay.com>",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "request": "^2.48.0",
-    "winston": "~0.8.3"
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "eslint": "7.6.0",
+    "eslint-config-airbnb-base": "14.1.0",
+    "eslint-plugin-import": "2.21.1"
   },
   "nbbpm": {
-    "compatibility": "^0.7.0 || ^0.8.0 || ^0.9.0 || ^1.0.0"
+    "compatibility": "^1.14.3"
   }
 }
