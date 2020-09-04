@@ -114,7 +114,7 @@ async function saveTokens(data) {
 	});
 }
 
-async function deleteImage(imageHash) {
+async function deleteImageByHash(imageHash) {
 	const settings = await getSettings();
 	if (!settings.imgurClientID) {
 		throw new Error('invalid-imgur-client-id');
@@ -142,22 +142,26 @@ async function deleteImage(imageHash) {
 
 	if (response.data.error && response.data.error === 'The access token provided is invalid.') {
 		await refreshToken();
-		await deleteImage(imageHash);
+		await deleteImageByHash(imageHash);
 		return;
 	}
 	throw new Error(response.data.error.message || response.data.error);
 }
 
-async function deletUserImage(uid) {
-	const userData = await user.getUserData(uid);
+async function deleteUserImage(userData) {
 	const pic = userData && userData.uploadedpicture;
 	if (!pic) {
 		return;
 	}
 	const match = pic.match(/^http.+imgur.+\/(.+)\./);
 	if (match && match[1]) {
-		await deleteImage(match[1]);
+		await deleteImageByHash(match[1]);
 	}
+}
+
+async function deleteCurrentImage(uid) {
+	const userData = await user.getUserData(uid);
+	await deleteUserImage(userData);
 }
 
 imgur.upload = async function (data) {
@@ -169,9 +173,9 @@ imgur.upload = async function (data) {
 		throw new Error('invalid-imgur-client-id');
 	}
 
-	// uploading a new profile image delete old one
+	// uploading a new profile image will delete old one
 	if (data.uid && data.folder === 'profile') {
-		await deletUserImage(data.uid);
+		await deleteCurrentImage(data.uid);
 	}
 
 	if (Date.now() >= settings.expiresAt) {
@@ -236,6 +240,10 @@ async function doUpload(data, settings) {
 
 	throw new Error(response.data.error.message || response.data.error);
 }
+
+imgur.actionUserDelete = async function (hookData) {
+	await deleteUserImage(hookData.user);
+};
 
 
 imgur.admin = {};
