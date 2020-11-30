@@ -133,7 +133,7 @@ async function deleteImageByHash(imageHash) {
 		response = JSON.parse(body);
 	} catch (err) {
 		winston.error('Unable to parse Imgur json response. [' + body + ']', err.message);
-		throw err;
+		throw new Error('[[error:imgur-json-parse-error]]');
 	}
 
 	if (response.success) {
