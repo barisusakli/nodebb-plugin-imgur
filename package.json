@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-imgur",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A Plugin that uploads images to imgur",
   "main": "index.js",
   "repository": {
