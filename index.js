@@ -4,12 +4,13 @@
 const request = require('request');
 const fs = require('fs');
 const util = require('util');
+
 const winston = require.main.require('winston');
 const db = require.main.require('./src/database');
 const user = require.main.require('./src/user');
 
 const requestAsync = util.promisify((verb, options, callback) => {
-	request[verb](options, function (err, res, body) {
+	request[verb](options, (err, res, body) => {
 		if (err) {
 			return callback(err);
 		}
@@ -123,16 +124,16 @@ async function deleteImageByHash(imageHash) {
 		await refreshToken();
 	}
 	const body = await requestAsync('delete', {
-		url: 'https://api.imgur.com/3/image/' + imageHash,
+		url: `https://api.imgur.com/3/image/${imageHash}`,
 		headers: {
-			Authorization: 'Bearer ' + settings.access_token,
+			Authorization: `Bearer ${settings.access_token}`,
 		},
 	});
 	let response;
 	try {
 		response = JSON.parse(body);
 	} catch (err) {
-		winston.error('Unable to parse Imgur json response. [' + body + ']', err.message);
+		winston.error(`Unable to parse Imgur json response. [' ${body} ']\n${err.message}`);
 		throw new Error('[[error:imgur-json-parse-error]]');
 	}
 
@@ -188,7 +189,7 @@ imgur.upload = async function (data) {
 };
 
 async function doUpload(data, settings) {
-	const image = data.image;
+	const { image } = data;
 	const type = image.url ? 'url' : 'file';
 	if (type === 'file' && !image.path) {
 		throw new Error('invalid image path');
@@ -197,8 +198,8 @@ async function doUpload(data, settings) {
 	let formDataImage;
 	if (type === 'file') {
 		formDataImage = fs.createReadStream(image.path);
-		formDataImage.on('error', function (err) {
-			winston.error('error reaing stream + ' + err.stack);
+		formDataImage.on('error', (err) => {
+			winston.error(`error reaing stream :\n${err.stack}`);
 		});
 	} else if (type === 'url') {
 		formDataImage = image.url;
@@ -209,7 +210,7 @@ async function doUpload(data, settings) {
 	const options = {
 		url: 'https://api.imgur.com/3/upload.json',
 		headers: {
-			Authorization: 'Bearer ' + settings.access_token,
+			Authorization: `Bearer ${settings.access_token}`,
 		},
 		formData: {
 			type: type,
@@ -225,7 +226,7 @@ async function doUpload(data, settings) {
 	try {
 		response = JSON.parse(body);
 	} catch (err) {
-		winston.error('Unable to parse Imgur json response. [' + body + ']', err.message);
+		winston.error(`Unable to parse Imgur json response. [' ${body} ']'\n${err.message}`);
 		throw err;
 	}
 
