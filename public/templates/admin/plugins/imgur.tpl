@@ -17,30 +17,29 @@
 </div>
 
 <form class="form">
-	<div class="row">
-		<div class="col-sm-6 col-xs-12">
-			<div class="form-group">
-				<label>Imgur Client ID</label>
+	<div class="row mb-4">
+		<div class="col-sm-6 col-12">
+			<div class="mb-3">
+				<label class="form-label">Imgur Client ID</label>
 				<input id="imgurClientID" type="text" class="form-control" placeholder="Enter Imgur Client ID" value="{settings.imgurClientID}">
 			</div>
-			<div class="form-group">
-				<label>Imgur Secret</label>
+			<div class="mb-3">
+				<label class="form-label">Imgur Secret</label>
 				<input id="imgurSecret" type="text" class="form-control" placeholder="Enter Imgur Secret" value="{settings.imgurSecret}">
 			</div>
-			<div class="form-group">
-				<label>Album ID</label>
+			<div>
+				<label class="form-label">Album ID</label>
 				<input id="albumID" type="text" class="form-control" placeholder="Enter Album ID" value="{settings.albumID}">
 			</div>
 		</div>
 	</div>
 </form>
 
-<!-- IF needsAuthorization -->
+{{{ if needsAuthorization }}}
 <div class="alert alert-warning">
 Access Token and/or Refresh Token missing. Please click Authorize below.
 </div>
-<!-- ENDIF needsAuthorization -->
-
+{{{ end }}}
 
 <button class="btn btn-primary" id="save">Save</button>
 <button class="btn btn-success" id="authorize">Authorize</button>
@@ -48,7 +47,6 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 <input id="csrf_token" type="hidden" value="{csrf}" />
 
 <script type="text/javascript">
-
 	var params = {};
 	var queryString = location.hash.substring(1);
 	var regex = /([^&=]+)=([^&]*)/g;
