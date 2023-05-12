@@ -47,10 +47,12 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 <input id="csrf_token" type="hidden" value="{csrf}" />
 
 <script type="text/javascript">
+(async function () {
 	var params = {};
 	var queryString = location.hash.substring(1);
 	var regex = /([^&=]+)=([^&]*)/g;
 	var m;
+	const alerts = await app.require('alerts');
 	while (m = regex.exec(queryString)) {
 		params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
 	}
@@ -58,7 +60,7 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 	if (params.access_token && params.refresh_token) {
 		params.csrf_token = $('#csrf_token').val();
 		$.post(config.relative_path + '/admin/plugins/imgur/tokens', params, function () {
-			app.alertSuccess('Authorized');
+			alerts.success('Authorized');
 		});
 	}
 
@@ -71,7 +73,7 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 		};
 
 		$.post(config.relative_path + '/api/admin/plugins/imgur/save', data, function(data) {
-			app.alertSuccess(data.message);
+			alerts.success(data.message);
 		});
 
 		return false;
@@ -80,10 +82,11 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 	$('#authorize').on('click', function() {
 		var clientID = $('#imgurClientID').val();
 		if (!clientID) {
-			return app.alertError('[[error:no-imgur-client-id]]');
+			return alerts.error('[[error:no-imgur-client-id]]');
 		}
 
 		window.location = 'https://api.imgur.com/oauth2/authorize?client_id=' + clientID + '&response_type=token';
 	});
+}());
 </script>
 
