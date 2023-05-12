@@ -56,7 +56,7 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 	}
 
 	if (params.access_token && params.refresh_token) {
-		params._csrf = $('#csrf_token').val();
+		params.csrf_token = $('#csrf_token').val();
 		$.post(config.relative_path + '/admin/plugins/imgur/tokens', params, function () {
 			app.alertSuccess('Authorized');
 		});
@@ -64,7 +64,7 @@ Access Token and/or Refresh Token missing. Please click Authorize below.
 
 	$('#save').on('click', function() {
 		var data = {
-			_csrf: $('#csrf_token').val(),
+			csrf_token: $('#csrf_token').val(),
 			imgurClientID: $('#imgurClientID').val(),
 			imgurSecret: $('#imgurSecret').val(),
 			albumID: $('#albumID').val()
