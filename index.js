@@ -44,6 +44,7 @@ async function renderAdmin(req, res) {
 		needsAuthorization: !settings.access_token || !settings.refresh_token,
 	};
 	res.render('admin/plugins/imgur', {
+		title: 'Imgur',
 		settings: data,
 		csrf: req.csrfToken(),
 	});
