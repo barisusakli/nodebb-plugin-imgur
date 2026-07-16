@@ -5,7 +5,7 @@
 		</div>
 		<div class="d-flex gap-1">
 			<button id="authorize" class="btn btn-light btn-sm fw-semibold ff-secondary text-center text-nowrap">Authorize</button>
-			<button id="save" class="btn btn-primary btn-sm fw-semibold ff-secondary text-center text-nowrap">[[admin/admin:save-changes]]</button>
+			<button id="save" class="btn btn-primary btn-sm fw-semibold ff-secondary text-center text-nowrap">{{tx("admin/admin:save-changes")}}</button>
 		</div>
 	</div>
 

@@ -5,9 +5,9 @@ const request = require('request');
 const fs = require('fs');
 const util = require('util');
 
-const winston = require.main.require('winston');
-const db = require.main.require('./src/database');
-const user = require.main.require('./src/user');
+const winston = nodebb.require('winston');
+const db = nodebb.require('./src/database');
+const user = nodebb.require('./src/user');
 
 const requestAsync = util.promisify((verb, options, callback) => {
 	request[verb](options, (err, res, body) => {
@@ -135,7 +135,7 @@ async function deleteImageByHash(imageHash) {
 		response = JSON.parse(body);
 	} catch (err) {
 		winston.error(`Unable to parse Imgur json response. [' ${body} ']\n${err.message}`);
-		throw new Error('[[error:imgur-json-parse-error]]');
+		throw new Error('[[error:imgur-json-parse-error]]', { cause: err });
 	}
 
 	if (response.success) {

@@ -8,7 +8,8 @@
     "url": "https://github.com/barisusakli/nodebb-plugin-imgur"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
   },
   "keywords": [
     "nodebb",
@@ -21,11 +22,10 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "eslint": "8.9.0",
-    "eslint-config-nodebb": "0.1.1",
-    "eslint-plugin-import": "2.25.4"
+    "eslint": "10.7.0",
+    "eslint-config-nodebb": "2.0.3"
   },
   "nbbpm": {
-    "compatibility": "^3.2.0"
+    "compatibility": "^4.14.0"
   }
 }
